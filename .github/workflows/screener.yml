@@ -1,0 +1,39 @@
+name: Nifty 500 Evening Screener
+
+on:
+  schedule:
+    # Runs hourly, 10:00 AM to 4:00 PM IST, Monday to Friday (NSE trading hours)
+    # IST = UTC+5:30, so 10:00/11:00/.../16:00 IST = 04:30/05:30/.../10:30 UTC
+    - cron: "30 4-10 * * 1-5"
+  workflow_dispatch: {}   # lets you manually trigger a run from the Actions tab, for testing
+
+jobs:
+  run-screener:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run screener
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python screener.py
+
+      - name: Upload log as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screener-log
+          path: screener.log
+          retention-days: 14
