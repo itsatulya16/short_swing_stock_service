@@ -1,6 +1,6 @@
 """
 Standalone Telegram delivery test — run this on its own to confirm your
-bot token and chat ID are correct, independent of the screener logic.
+bot token and chat ID are correct, independent of the screener_logic.
 """
 
 import requests
